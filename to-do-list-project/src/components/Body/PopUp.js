@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import "./PopUp.css"
 
 const PopUp = (props) => {
-
-
     return(
         <div className='popup-content flex items-center' >
             {/* Exit Body */}
@@ -27,7 +25,7 @@ const PopUp = (props) => {
                 </select>
 
                 <div className='flex flex-row w-30'>
-                    <button className='mt3 mr2' onClick={props.addTask} >Add Task</button>
+                    <button className='mt3 mr2' onClick={props.addTaskButton} >Add Task</button>
                     <button className='mt3 mr2' onClick={props.cancelButton}>Cancel  </button>
                 </div>
                 
