@@ -16,7 +16,7 @@ const Body = () => {
     //Add task PopUp window
     const togglePopUp = (event) => { setOpenPopUp(prevCondition => !prevCondition) };
     //checkbox 
-    const checkboxValue = (event) => { setCheckboxFieldValue(event.target.value);};
+    const checkboxValue = (event) => { setCheckboxFieldValue(!checkboxFieldValue);};
     //cancel button
     const cancelButton = (event) => { setOpenPopUp(prevCondition => !prevCondition) };
     //main window option 
@@ -24,14 +24,15 @@ const Body = () => {
     //popup window option
     const optionValueState = (event) => { setOptionValue(event.target.value);};
     // Fetch Data from Database
-    const fetchData = async () => {
+    const fetchData = async (id, checkboxFieldValue) => {
         try {
           const response = await fetch('http://localhost:3051/database', {
-            method: 'get',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            body : JSON.stringify({ checkbox : checkboxFieldValue,
+                                    id: id })
           });
           const data = await response.json();
-          console.log(data)
           setDatabase(data);
         } catch (error) { console.log(error) }
       };
@@ -94,9 +95,9 @@ const Body = () => {
                 { // If status is All
                 (mainWindowOptionValue === 'All') 
                 &&
-                <div>
+                <div className='flex flex-row w-100 items-center justify-between'>
                     <div className='flex flex-row'>
-                        <input type='checkbox' onChange={checkboxValue} className='mr1'/>
+                        <input type='checkbox' onChange={checkboxValue} checked={checkboxFieldValue} className='mr1'/>
                         <p >{data.title}</p>
                     </div>
                     <div className='mr3'>
@@ -107,7 +108,7 @@ const Body = () => {
                 { //If status is Complete
                     (mainWindowOptionValue === 'Complete' && data.status === mainWindowOptionValue )
                     &&
-                    <div>
+                    <div className='flex flex-row w-100 items-center justify-between'>
                         <div className='flex flex-row'>
                             <input type='checkbox' onChange={checkboxValue} className='mr1'/>
                             <p >{data.title}</p>
@@ -120,7 +121,7 @@ const Body = () => {
                 {  //If status is Incomplete
                     (mainWindowOptionValue === 'Incomplete' && data.status === mainWindowOptionValue )
                     &&
-                    <div>
+                    <div className='flex flex-row w-100 items-center justify-between'>
                         <div className='flex flex-row'>
                             <input type='checkbox' onChange={checkboxValue} className='mr1'/>
                             <p >{data.title}</p>
