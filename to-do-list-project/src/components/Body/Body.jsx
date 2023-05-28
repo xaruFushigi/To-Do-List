@@ -3,7 +3,6 @@ import PopUp from './PopUp';
 //CSS
 import style from './Body.module.css';
 const Body = () => {
-    
     const [openPopUp, setOpenPopUp] = useState(false);
     const [titleInputValueField, setTitleInputValueField] = useState('');
     const [optionValue, setOptionValue] = useState('Incomplete');
@@ -15,8 +14,22 @@ const Body = () => {
     const getTitleInputValueField = (event) => { setTitleInputValueField(event.target.value);};
     //Add task PopUp window
     const togglePopUp = (event) => { setOpenPopUp(prevCondition => !prevCondition) };
+
     //checkbox 
-    const checkboxValue = (event) => { setCheckboxFieldValue(!checkboxFieldValue);};
+    const checkboxValue = async (event, id, status) => { 
+        const changedStatus = status === 'Incomplete' ? 'Complete' : 'Incomplete';
+        try {
+            const response = await fetch('http://localhost:3051/updatedStatus', {
+                method : 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body : JSON.stringify({id : id,
+                                       status: changedStatus }),
+            });
+            const data = await response.json();
+            fetchData();                                        //fetch database to show updated staus from the backend
+        }
+        catch (error) { console.log(error) };
+    };
     //cancel button
     const cancelButton = (event) => { setOpenPopUp(prevCondition => !prevCondition) };
     //main window option 
@@ -24,13 +37,11 @@ const Body = () => {
     //popup window option
     const optionValueState = (event) => { setOptionValue(event.target.value);};
     // Fetch Data from Database
-    const fetchData = async (id, checkboxFieldValue) => {
+    const fetchData = async () => {
         try {
-          const response = await fetch('http://localhost:3051/database', {
-            method: 'POST',
+          const response = await fetch(`http://localhost:3051/database?status=${mainWindowOptionValue}`, {
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
-            body : JSON.stringify({ checkbox : checkboxFieldValue,
-                                    id: id })
           });
           const data = await response.json();
           setDatabase(data);
@@ -97,7 +108,10 @@ const Body = () => {
                 &&
                 <div className='flex flex-row w-100 items-center justify-between'>
                     <div className='flex flex-row'>
-                        <input type='checkbox' onChange={checkboxValue} checked={checkboxFieldValue} className='mr1'/>
+                        <input type='checkbox' 
+                               onChange={ (event) => checkboxValue(event, data.id, data.status)} 
+                               checked={data.status === 'Complete'} className='mr1'
+                        />
                         <p >{data.title}</p>
                     </div>
                     <div className='mr3'>
