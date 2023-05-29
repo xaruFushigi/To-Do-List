@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import PopUp from './PopUp';
+import PopUp from './PopUpWindow/PopUp';
+import TaskOptionAll from './TaskOptionAll/TaskOptionAll';
+import TaskOptionComplete from './TaskOptionAll/TaskOptionComplete';
+import TaskOptionIncomplete from './TaskOptionAll/TaskOptionIncomplete';
+import Scroll from './Scroll';
 // CSS
-// import style from './Body.module.css';
+// import styles from './Body.module.css';
 const Body = () => {
   const [openPopUp, setOpenPopUp] = useState(false);
   const [titleInputValueField, setTitleInputValueField] = useState('');
@@ -48,7 +52,7 @@ const Body = () => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3051/database?status=${mainWindowOptionValue}`,
+        `http://localhost:3051/database?status=${mainWindowOptionValue}&orderBy=dateoftask`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -118,94 +122,67 @@ const Body = () => {
   };
   // map within database
   const renderItems = () => {
-    return database.map((data, index) => (
+    let filteredData = database;
+
+    if (mainWindowOptionValue !== 'All') {
+      filteredData = database.filter(
+        data => data.status === mainWindowOptionValue
+      );
+    }
+    // Sort the data based on the date column in descending order
+    filteredData.sort((a, b) => new Date(b.date) - new Date(a.date));
+    return filteredData.map((data, index) => (
       <div
-        className="flex flex-row w-100 items-center justify-between"
-        key={data.id}
+        className="flex flex-column w-100 items-center justify-between"
+        key={index}
       >
         {
           // If status is All
           mainWindowOptionValue === 'All' && (
-            <div className="flex flex-row w-100 items-center justify-between">
-              <div className="flex flex-row">
-                <input
-                  type="checkbox"
-                  onChange={event => checkboxValue(event, data.id, data.status)}
-                  checked={data.status === 'Complete'}
-                  className="mr1"
-                />
-                <p>{data.title}</p>
-              </div>
-              <div className="mr3">
-                <button
-                  key={index}
-                  onClick={() => {
-                    deleteTaskButton(data.id);
-                  }}
-                >
-                  delete
-                </button>
-              </div>
-            </div>
+            <TaskOptionAll
+              filteredData={filteredData}
+              mainWindowOptionValue={mainWindowOptionValue}
+              database={database}
+              checkboxValue={checkboxValue}
+              deleteTaskButton={deleteTaskButton}
+              id={data.id}
+              status={data.status}
+              title={data.title}
+              index={index}
+            />
           )
         }
         {
           // If status is Complete
-          mainWindowOptionValue === 'Complete' &&
-            data.status === mainWindowOptionValue && (
-              <div className="flex flex-row w-100 items-center justify-between">
-                <div className="flex flex-row">
-                  <input
-                    type="checkbox"
-                    onChange={event =>
-                      checkboxValue(event, data.id, data.status)
-                    }
-                    checked={data.status === 'Complete'}
-                    className="mr1"
-                  />
-                  <p>{data.title}</p>
-                </div>
-                <div className="mr3">
-                  <button
-                    key={index}
-                    onClick={() => {
-                      deleteTaskButton(data.id);
-                    }}
-                  >
-                    delete
-                  </button>
-                </div>
-              </div>
-            )
+          mainWindowOptionValue === 'Complete' && (
+            <TaskOptionComplete
+              filteredData={filteredData}
+              mainWindowOptionValue={mainWindowOptionValue}
+              database={database}
+              checkboxValue={checkboxValue}
+              deleteTaskButton={deleteTaskButton}
+              id={data.id}
+              status={data.status}
+              title={data.title}
+              index={index}
+            />
+          )
         }
         {
           // If status is Incomplete
-          mainWindowOptionValue === 'Incomplete' &&
-            data.status === mainWindowOptionValue && (
-              <div className="flex flex-row w-100 items-center justify-between">
-                <div className="flex flex-row">
-                  <input
-                    type="checkbox"
-                    onChange={event =>
-                      checkboxValue(event, data.id, data.status)
-                    }
-                    checked={data.status === 'Complete'}
-                    className="mr1"
-                  />
-                  <p>{data.title}</p>
-                </div>
-                <div className="mr3">
-                  <button
-                    key={index}
-                    onClick={() => {
-                      deleteTaskButton(data.id);
-                    }}
-                  >
-                    delete
-                  </button>
-                </div>
-              </div>
-            )
+          mainWindowOptionValue === 'Incomplete' && (
+            <TaskOptionIncomplete
+              filteredData={filteredData}
+              mainWindowOptionValue={mainWindowOptionValue}
+              database={database}
+              checkboxValue={checkboxValue}
+              deleteTaskButton={deleteTaskButton}
+              id={data.id}
+              status={data.status}
+              title={data.title}
+              index={index}
+            />
+          )
         }
       </div>
     ));
@@ -236,7 +213,9 @@ const Body = () => {
         />
       )}
       <div className="w-100 br3 outline">
-        <div className="flex flex-column items-start ml4">{renderItems()}</div>
+        <div className="flex flex-column items-start ml4 mt3">
+          <Scroll>{renderItems()}</Scroll>
+        </div>
       </div>
     </div>
   );
