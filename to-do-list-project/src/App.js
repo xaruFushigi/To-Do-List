@@ -4,7 +4,7 @@ import 'tachyons';
 
 import { Header, Body, Footer } from './components';
 
-function App() {
+const App = () => {
   return (
     <div className="App flex flex-column justify-center items-center">
       <Header />
@@ -12,6 +12,6 @@ function App() {
       <Footer />
     </div>
   );
-}
+};
 
 export default App;
