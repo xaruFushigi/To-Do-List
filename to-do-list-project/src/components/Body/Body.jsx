@@ -26,7 +26,7 @@ const Body = () => {
   const checkboxValue = async (event, id, status) => {
     const changedStatus = status === 'Complete' ? 'Incomplete' : 'Complete';
     try {
-      await fetch(`http://localhost:3051/updateStatus/${id}`, {
+      await fetch(`https://todolist-back-end.onrender.com/updateStatus/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: changedStatus }),
@@ -52,7 +52,7 @@ const Body = () => {
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3051/database?status=${mainWindowOptionValue}&orderBy=dateoftask`,
+        `https://todolist-back-end.onrender.com/database?status=${mainWindowOptionValue}&orderBy=dateoftask`,
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -67,7 +67,7 @@ const Body = () => {
   // delete button
   const deleteTaskButton = async id => {
     try {
-      await fetch('http://localhost:3051/delete', {
+      await fetch('https://todolist-back-end.onrender.com/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: id }),
